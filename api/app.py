@@ -1,20 +1,21 @@
 from flask import Flask, make_response
+from flask_cors import CORS
 from flask_restful import Api, Resource
-import json
+import json, boto3
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
-users = [
-    {'username': 'zlind', 'id': 0},
-    {'username': 'zberg', 'id': 1}
-]
+db = boto3.resource('dynamodb', region_name='us-west-1')
+users = db.Table('zlind-game-users')
 
 @api.resource('/')
 class Index(Resource):
     def get(self):
+        scan = users.scan()
         return make_response(
-            json.dumps(users),
+            json.dumps(scan['Items']),
             200,
             {'content-type': 'application/json'}
         )
