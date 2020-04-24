@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Flask, make_response, request
 from flask_cors import CORS
 from flask_restful import Api, Resource
 import json, boto3
@@ -16,6 +16,17 @@ class Index(Resource):
         scan = users.scan()
         return make_response(
             json.dumps(scan['Items']),
+            200,
+            {'content-type': 'application/json'}
+        )
+    def put(self):
+        data = request.json
+        users.put_item(Item = {
+            'username': data['username'],
+            'password': data['password']
+        })
+        return make_response(
+            json.dumps('Success!'),
             200,
             {'content-type': 'application/json'}
         )
