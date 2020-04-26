@@ -18,6 +18,17 @@ class App extends React.Component {
     document.cookie = 'user=;max-age=0';
     this.setState({username: ''});
   }
+  componentDidMount() {
+    const cookies = document.cookie.split(';')
+    for (var cookie of cookies) {
+      var index = cookie.indexOf('user=');
+      if (index !== -1) {
+        this.loadUserProfile(cookie.substr(index+5));
+        return;
+      }
+    }
+    console.log('no user cookie saved');
+  }
   render() {
     return (
       <div className='App'>
