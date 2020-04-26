@@ -66,7 +66,10 @@ class Login extends React.Component {
       body: JSON.stringify(user)
     }).then(res => res.json()
     .then(data => {
-      if (data.success) this.setState({toPlay: true});
+      if (data.success) {
+        this.props.load(user.username);
+        this.setState({toPlay: true});
+      }
       else console.log('login failure');
     }))
   }
@@ -83,7 +86,10 @@ class Login extends React.Component {
       body: JSON.stringify(user)
     }).then(res => res.json()
     .then(data => {
-      if (data.success) this.setState({toPlay: true});
+      if (data.success) {
+        this.props.load(user.username);
+        this.setState({toPlay: true});
+      }
       else console.log('username taken');
     }))
   }
