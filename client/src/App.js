@@ -33,7 +33,8 @@ class App extends React.Component {
     return (
       <div className='App'>
         <Route exact path='/'>
-          <Home user={this.state.username} load={this.loadUserProfile}/>
+          <Home user={this.state.username} load={this.loadUserProfile}
+           signout={this.signout}/>
         </Route>
         <Route exact path='/login'>
           <Login login={true} load={this.loadUserProfile}/>
