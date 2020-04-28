@@ -37,40 +37,38 @@ class Login extends React.Component {
   }
   loginUser = () => {
     if (!this.checkForm()) return;
-    var user = this.parseUser();
     fetch(apiUrl+'/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(user)
+      body: JSON.stringify({action: 'login', user: this.parseUser()})
     }).then(res => res.json()
     .then(data => {
       if (data.success) {
-        this.props.load(user.username);
+        this.props.load(data.user);
         this.setState({toPlay: true});
       } else {
-        console.log('login failure');
+        console.log(data.message);
         this.setState({badAuth: true})
       }
     }))
   }
   addUser = () => {
     if (!this.checkForm()) return;
-    var user = this.parseUser();
     fetch(apiUrl+'/users', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(user)
+      body: JSON.stringify({user: this.parseUser()})
     }).then(res => res.json()
     .then(data => {
       if (data.success) {
-        this.props.load(user.username);
+        this.props.load(data.user);
         this.setState({toPlay: true});
       } else {
-        console.log('username taken');
+        console.log(data.message);
         this.setState({badAuth: true})
       }
     }))

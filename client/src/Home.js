@@ -7,9 +7,9 @@ class Home extends React.Component {
     return(
       <Container className='bg-secondary text-center'>
         <h1>Games by ZLIND</h1>
-        {this.props.user !== '' ? (
+        {this.props.user !== null ? (
           <>
-            <p>You are logged in as {this.props.user}</p>
+            <p>You are logged in as {this.props.user.username}</p>
             <Link to='/play'>
               Play
             </Link>

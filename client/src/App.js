@@ -1,39 +1,62 @@
 import React from 'react';
-import {Route, Link} from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import Home from './Home.js';
 import Login from './Login.js';
+import Play from './Play.js';
+
+let IN_DEV = false;
+let awsApi = 'https://4enr01t30i.execute-api.us-west-1.amazonaws.com/dev';
+let localApi = 'http://localhost:5000';
+let apiUrl = (IN_DEV ? localApi : awsApi);
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: ''
+      user: null
     }
   }
-  loadUserProfile = username => {
-    document.cookie = 'user='+username;
-    this.setState({username: username});
+  loadUserProfile = user => {
+    document.cookie = 'user='+user.username;
+    this.setState({user: user});
   }
   signout = () => {
-    document.cookie = 'user=;max-age=0';
-    this.setState({username: ''});
+    fetch(apiUrl+'/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({action: 'logout', user: this.state.user})
+    }).then(res => res.json()
+    .then(data => {
+      if (data.success) {
+        document.cookie = 'user=;max-age=0';
+        this.setState({user: null});
+      } else {
+        console.log(data.message);
+        console.log('not logged out');
+      }
+    }));
   }
   componentDidMount() {
     const cookies = document.cookie.split(';')
     for (var cookie of cookies) {
       var index = cookie.indexOf('user=');
       if (index !== -1) {
-        this.loadUserProfile(cookie.substr(index+5));
+        fetch(apiUrl+'/users?name='+cookie.substring(index+5))
+        .then(res => res.json().then(data => {
+          console.log(data);
+          this.loadUserProfile(data.user);
+        }));
         return;
       }
     }
-    console.log('no user cookie saved');
   }
   render() {
     return (
       <div className='App'>
         <Route exact path='/'>
-          <Home user={this.state.username} load={this.loadUserProfile}
+          <Home user={this.state.user} load={this.loadUserProfile}
            signout={this.signout}/>
         </Route>
         <Route exact path='/login'>
@@ -43,12 +66,7 @@ class App extends React.Component {
           <Login login={false} load={this.loadUserProfile}/>
         </Route>
         <Route exact path='/play'>
-          <p>You are playing as {this.state.username}</p>
-          <Link to='/'>Home</Link>
-          <br/>
-          <Link to='/' onClick={this.signout}>
-            Sign out
-          </Link>
+          <Play user={this.state.user} signout={this.signout}/>
         </Route>
       </div>
     );
