@@ -3,6 +3,9 @@ import {Container, Button} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 
 class Home extends React.Component {
+  componentDidMount() {
+    document.title = 'Games by ZLIND';
+  }
   render() {
     return(
       <Container className='bg-secondary text-center'>

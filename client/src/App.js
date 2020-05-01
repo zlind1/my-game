@@ -47,7 +47,6 @@ class App extends React.Component {
       if (index !== -1) {
         fetch(apiUrl+'/users?name='+cookie.substring(index+5))
         .then(res => res.json().then(data => {
-          console.log(data);
           this.loadUserProfile(data.user);
         }));
         return;

@@ -37,7 +37,6 @@ class TicTacToe extends React.Component {
     }
     var matchFound = false;
     if (rowMatch !== -1) {
-      console.log('row match: row '+rowMatch+', '+board[rowMatch][0]);
       matchFound = true;
       ctx.beginPath();
       ctx.moveTo(50, rowMatch*200+100);
@@ -45,7 +44,6 @@ class TicTacToe extends React.Component {
       ctx.stroke();
     }
     if (colMatch !== -1) {
-      console.log('col match: col '+colMatch+', '+board[0][colMatch]);
       matchFound = true;
       ctx.beginPath();
       ctx.moveTo(colMatch*200+100, 50);
@@ -53,7 +51,6 @@ class TicTacToe extends React.Component {
       ctx.stroke();
     }
     if (diagMatch !== -1) {
-      console.log('diag match: down '+(diagMatch === 0 ? 'right' : 'left')+', '+board[1][1]);
       matchFound = true;
       ctx.beginPath();
       if (diagMatch === 0) {
@@ -99,7 +96,6 @@ class TicTacToe extends React.Component {
     var i = Math.floor((event.clientY-offY) / 200);
     var j = Math.floor((event.clientX-offX) / 200);
     if (board[i][j] !== '') {
-      console.log('square already taken');
       return;
     } else if (xturn) {
       board[i][j] = 'x';
@@ -110,12 +106,17 @@ class TicTacToe extends React.Component {
     }
     this.redraw();
     // check for 3 in a row
-    if (this.checkWinner()) {
+    var gameover = this.checkWinner();
+    if (gameover) {
       canvas.onclick = canvas.ontouchstart = null;
-      console.log('You Win!');
+      setTimeout(() => {
+        alert((xturn ? 'O' : 'X')+' wins!');
+
+      }, 50);
     }
   }
   componentDidMount() {
+    document.title = 'Tic Tac Toe';
     this.initVariables();
     canvas.onclick = canvas.ontouchstart = this.handleClick;
     this.redraw();

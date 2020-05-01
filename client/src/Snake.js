@@ -103,7 +103,6 @@ class SnakeObj {
 }
 
 function handleKeydown(event) {
-  console.log('key press');
   if (event.key === 'ArrowUp') {
     if (s.dir !== 2) s.nextdir = 0;
   } else if (event.key === 'ArrowRight') {
@@ -133,6 +132,7 @@ class Snake extends React.Component {
     s.update();
   }
   componentDidMount() {
+    document.title = 'Snake Game';
     canvas = this.canvasRef.current;
     ctx = canvas.getContext('2d');
     this.reset();
