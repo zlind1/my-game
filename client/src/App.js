@@ -3,6 +3,8 @@ import {Route} from 'react-router-dom';
 import Home from './Home.js';
 import Login from './Login.js';
 import Play from './Play.js';
+import TicTacToe from './TicTacToe.js';
+import Snake from './Snake.js';
 
 let IN_DEV = false;
 let awsApi = 'https://4enr01t30i.execute-api.us-west-1.amazonaws.com/dev';
@@ -67,6 +69,12 @@ class App extends React.Component {
         </Route>
         <Route exact path='/play'>
           <Play user={this.state.user} signout={this.signout}/>
+        </Route>
+        <Route exact path='/tictactoe'>
+          <TicTacToe />
+        </Route>
+        <Route exact path='/snake'>
+          <Snake />
         </Route>
       </div>
     );
