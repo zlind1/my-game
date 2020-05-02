@@ -1,38 +1,38 @@
 import React from 'react';
+import {Container} from 'react-bootstrap';
 
-let canvas, ctx, s, food;
+let container, canvas, ctx, s, food, cellSize, length;
 
 function randPos() {
   return [Math.floor(Math.random()*20), Math.floor(Math.random()*20)]
 }
 function clearScreen() {
   ctx.fillStyle = 'black';
-  ctx.fillRect(0, 0, 400, 400);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 function drawFood() {
   ctx.fillStyle = 'blue';
-  ctx.fillRect(food[0]*20, food[1]*20, 20, 20);
+  ctx.fillRect(food[0]*cellSize, food[1]*cellSize, cellSize, cellSize);
 }
 function drawNode(node) {
   ctx.fillStyle = 'red';
-  ctx.fillRect(node.x*20, node.y*20, 20, 20);
+  ctx.fillRect(node.x*cellSize, node.y*cellSize, cellSize, cellSize);
   if (node.next != null) drawNode(node.next);
 }
 function drawLines() {
   ctx.strokeStyle = 'black';
   ctx.beginPath();
   for (var i = 1; i < 20; i++) {
-    ctx.moveTo(i*20, 0);
-    ctx.lineTo(i*20, 400);
-    ctx.moveTo(0, i*20);
-    ctx.lineTo(400, i*20);
+    ctx.moveTo(i*cellSize, 0);
+    ctx.lineTo(i*cellSize, canvas.height);
+    ctx.moveTo(0, i*cellSize);
+    ctx.lineTo(canvas.width, i*cellSize);
   }
   ctx.stroke();
 }
 
 class SnakeObj {
-  constructor(incLength, reset) {
-    this.incLength = incLength;
+  constructor(reset) {
     this.reset = reset;
     this.head = {
       x: 10,
@@ -66,7 +66,7 @@ class SnakeObj {
     this.head = newhead;
     if (newx === food[0] && newy === food[1]) {
       food = randPos();
-      this.incLength();
+      length++;
     } else {
       this.head.prev = this.head.prev.prev;
       this.head.prev.next = null;
@@ -84,19 +84,22 @@ class SnakeObj {
     }
     return (headx < 0 || headx > 19 || heady < 0 || heady > 19 || selfCollide);
   }
+  redraw = () => {
+    clearScreen();
+    drawFood();
+    drawNode(this.head);
+    drawLines();
+  }
   update = () => {
     this.dir = this.nextdir;
     this.move();
     if (this.paused) {
       return;
     } else if (this.checkCollision()) {
-      alert('Oh no! you died :(');
+      alert('Oh no! you died :(\nYou got to length '+length);
       this.reset();
     } else {
-      clearScreen();
-      drawFood();
-      drawNode(this.head);
-      drawLines();
+      this.redraw();
       setTimeout(this.update, 1000/6);
     }
   }
@@ -117,25 +120,31 @@ function handleKeydown(event) {
 class Snake extends React.Component {
   constructor(props) {
     super(props);
+    this.containerRef = React.createRef();
     this.canvasRef = React.createRef();
-    this.state = {
-      length: 0,
-    }
-  }
-  incLength = () => {
-    this.setState({length: this.state.length+1});
   }
   reset = () => {
     food = randPos();
-    s = new SnakeObj(this.incLength, this.reset);
-    this.setState({length: 1});
+    s = new SnakeObj(this.reset);
+    length = 1;
     s.update();
+  }
+  handleResize = () => {
+    let min = (a, b) => (a < b ? a : b);
+    canvas.width = min(container.offsetWidth-32, window.innerHeight-32);
+    canvas.height = canvas.width;
+    cellSize = canvas.width/20;
+    ctx.lineWidth = canvas.width/120;
+    s.redraw();
   }
   componentDidMount() {
     document.title = 'Snake Game';
     canvas = this.canvasRef.current;
+    container = this.containerRef.current;
     ctx = canvas.getContext('2d');
     this.reset();
+    this.handleResize();
+    window.onresize = this.handleResize;
     window.onkeydown = handleKeydown;
   }
   componentWillUnmount() {
@@ -143,12 +152,11 @@ class Snake extends React.Component {
   }
   render() {
     return (
-      <div>
+      <Container ref={this.containerRef} className='d-flex justify-content-center p-3'>
         <canvas ref={this.canvasRef} width='400' height='400'>
           canvas not supported in your browser
         </canvas>
-        <h1>Your length: {this.state.length}</h1>
-      </div>
+      </Container>
     );
   }
 }
